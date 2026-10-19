@@ -1,0 +1,8 @@
+{
+  "status": "not_deployed",
+  "network": "studionet",
+  "contract_address": null,
+  "source_sha256": null,
+  "transactions": [],
+  "expected_snapshot": null
+}
