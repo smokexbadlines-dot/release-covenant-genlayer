@@ -1,6 +1,6 @@
 {
   "status": "deployed",
-  "workflow_status": "open_challenge_awaiting_timeout_refund",
+  "workflow_status": "timeout_refund_withdrawn",
   "network": "studionet",
   "contract_address": "0x4a91df32Cad47C5a2FBac95C9C396Ffda05584A4",
   "source_sha256": "43db99346e657764460d52753b9176a570d63713b0cd07d15c90acb4fdc269bd",
@@ -20,16 +20,19 @@
     {"label": "seal promise", "hash": "0xbba9b6113afd66a7f99c0a3a3f2b4a3c6d453bcb589d93284ab3de55811523fb"},
     {"label": "sponsor 1 GEN", "hash": "0x8887f70503dc0a27419299edeb1497ce12d6ec94ce9c387c79513a5e010bbb5a"},
     {"label": "upheld Python 3.10 break", "hash": "0x2b0948e19aec83cefd1acbda1d21fe2693dacff2c3135e6fe17134a882a8fd10", "expected_result": "BREAK", "minimum_agree_votes": 2},
-    {"label": "duplicate challenge rejected", "hash": "0xac6f826a85d0b6941bba6e320ddd353bf8aef81fe9ddb0583d198bd95a559133", "expected_execution": "ERROR", "expected_error": "promise already has an open challenge", "minimum_agree_votes": 2}
+    {"label": "duplicate challenge rejected", "hash": "0xac6f826a85d0b6941bba6e320ddd353bf8aef81fe9ddb0583d198bd95a559133", "expected_execution": "ERROR", "expected_error": "promise already has an open challenge", "minimum_agree_votes": 2},
+    {"label": "timeout settles refund", "hash": "0x0487ebed9f2a329b14a70f10dce7fa9f63abb891c9f61be455c2d67764586d77", "expected_result": "REFUND", "minimum_agree_votes": 2},
+    {"label": "sponsor claims timeout refund", "hash": "0x53f32c94e5e9089155d8f27d5cdb69335bd7e0e985c592b27b7cad89db1691cb"},
+    {"label": "sponsor withdraws timeout refund", "hash": "0xd938a56bfb87249176ba0cc34284ea9c4b6819adc10887b737cb7c627fba0ce5"}
   ],
   "expected_snapshot": {
     "sealed": true,
     "round": 1,
-    "outcome": "PENDING",
+    "outcome": "REFUND",
     "total_sponsored_wei": "1000000000000000000"
   },
   "expected_promise_states": ["OPEN"],
   "expected_accounts": [
-    {"address": "0x13A60e3F0bB123D91D1a2acCBEa1b15f99D3288A", "deposited_wei": "1000000000000000000", "claimable_wei": "0"}
+    {"address": "0x13A60e3F0bB123D91D1a2acCBEa1b15f99D3288A", "deposited_wei": "0", "claimable_wei": "0"}
   ]
 }

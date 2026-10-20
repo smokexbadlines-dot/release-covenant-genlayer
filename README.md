@@ -2,7 +2,7 @@
 
 Release Covenant is a GenLayer Native app for a public software release promise. A sponsor funds a covenant, anyone can challenge one documented promise with commit-pinned GitHub evidence, and validators judge whether that exact evidence shows a break. The maintainer gets one revision round. An upheld objection must be positively repaired at the revised commit; unresolved objections trigger pull refunds at the deadline.
 
-**Current state:** the frontend and contract are built, and six direct-mode tests pass. The [evidence probe](deploy/probe-proof.json) finalized three validator fetches of the pinned baseline, break, and repair files. Two [main contract](deploy/proof.json) [demonstrations](deploy/refund-proof.json) are deployed on StudioNet: each has a finalized, validator-upheld `BREAK`, a sealed promise, and 1 test GEN of sponsorship. The refund demonstration also has a finalized expected `ERROR` for a duplicate challenge. The repair, settlement, and refund windows are still pending. Run `pnpm verify:proof`, `pnpm verify:refund`, and `pnpm verify:probe` for byte-identical source, finality, leader execution, votes, and finalized state. The [hosted app](https://release-covenant-genlayer-20261020.opalfairy1.chatgpt.site/) is a private preview.
+**Current state:** the frontend and contract are built, and six direct-mode tests pass. The [evidence probe](deploy/probe-proof.json) finalized three validator fetches of the pinned baseline, break, and repair files. Two separate covenants now have completed, finalized refund paths: the planned [timeout case](deploy/refund-proof.json) and an [earlier repair attempt](deploy/proof.json) whose revision window was missed. Both sponsors claimed and withdrew 1 test GEN; the timeout case also has a finalized expected `ERROR` for a duplicate challenge. A fresh [repair attempt](deploy/repair-proof.json) has a sealed promise, 1 test GEN sponsorship, and a finalized validator-upheld `BREAK`. Its revision and payout windows remain ahead. Run the corresponding `verify:*` scripts for byte-identical source, finality, leader execution, votes, and finalized state. The [hosted app](https://release-covenant-genlayer-20261020.opalfairy1.chatgpt.site/) is public.
 
 ## Mechanism
 
@@ -24,6 +24,10 @@ The model only returns a bounded label. Validators independently fetch both raw 
 
 The initial round ends at `first_close`. With no upheld objection, anyone can settle and credit the maintainer. With an open objection, the maintainer may provide one new commit before `revision_deadline`. Each upheld objection is carried to round two and must be rechecked against the new commit. New challenges remain possible until `final_close`. Unresolved `OPEN` or `CARRIED` states cause refunds. A revision never silently clears an objection.
 
+## Distinction from earlier work
+
+The earlier [PACTPROOF](https://github.com/smokexbadlines-dot/pactproof-genlayer) funds an assigned builder's grant and assesses submitted evidence against preregistered criteria, including weighted partial payouts. Release Covenant starts with a maintainer's public release promise. Any participant can lodge a contradictory, commit-pinned challenge; an upheld objection survives the maintainer's one permitted revision until a separate, affirmative repair judgment clears it. A timeout returns each sponsor's own deposit. This is a two-round objection and cure protocol, rather than a grant assessment. [Policy Drift Firewall](https://github.com/smokexbadlines-dot/policy-drift-firewall-genlayer) classifies policy changes and requires two-party reconsent for material changes; it has no evidence-backed break challenge, positive cure judgment, or escrow settlement. The earlier Eligibility Judge qualifies entries against a fixed rulebook; it has neither an adversarial release objection nor a carried repair obligation.
+
 ## Run locally
 
 Requires Node.js 20+ and Python 3.12+.
@@ -36,9 +40,9 @@ python -m pip install genlayer-test
 python -m pytest tests/test_direct.py -q
 ```
 
-The app uses the stable `genlayer-js` 1.1 line and StudioNet. A wallet and StudioNet test GEN are needed to deploy and write. The Create form deploys the included contract source; then the maintainer adds up to four promises and seals the covenant. Paste a deployed address into the Explore form for finalized reads. Submitted transaction IDs are kept in browser local storage and polled every eight seconds across reloads. The app checks status and execution separately and exposes native appeals during an appealable accepted state.
+The app uses the stable `genlayer-js` 1.1 line and StudioNet. MetaMask with the GenLayer Snap and StudioNet test GEN is needed to deploy and write; `connect()` requests the Snap if missing and asks the wallet to add or switch to StudioNet. The Create form deploys the included contract source; then the maintainer adds up to four promises and seals the covenant. Paste a deployed address into the Explore form for finalized reads. Submitted transaction IDs are kept in browser local storage and polled every eight seconds across reloads. The app checks status and execution separately and exposes native appeals during an appealable accepted state.
 
-`node deploy/probe.mjs` asks StudioNet to parse the pinned-runner contract schema without signing or deploying. `pnpm verify:proof` checks the repair-path contract; `pnpm verify:refund` checks the timeout-path contract, including the expected duplicate-challenge rollback. Both manifests currently record active covenants. Their expected snapshots will be updated after their deadlines and claims finalize.
+`node deploy/probe.mjs` asks StudioNet to parse the pinned-runner contract schema without signing or deploying. `pnpm verify:proof` checks the missed-revision refund; `pnpm verify:refund` checks the planned timeout refund, including the expected duplicate-challenge rollback. `pnpm verify:repair` checks the fresh repair attempt. The verifier reads finalized StudioNet state and does not submit transactions.
 
 ## Evidence contract
 
@@ -47,7 +51,7 @@ The app uses the stable `genlayer-js` 1.1 line and StudioNet. A wallet and Studi
 - The judgment concerns a **documented compatibility promise**. It does not prove runtime behavior, project ownership, or that an unchallenged promise is true.
 - Anyone may instantiate a covenant naming any public GitHub repository. Sponsors should inspect the maintainer wallet, baseline quote, terms, and deadlines before funding.
 - Raw GitHub reachability from a local browser does not prove validator reachability. Test it with an on-network fetch before relying on a demo repository.
-- The Site preview is private. Its recorded receipt list comes from `deploy/proof.json`; its covenant state is fetched live from StudioNet. The independent historical replay is not an upstream maintainer promise. Public GitHub source is a separate publication step.
+- The Site is public. Its recorded receipt lists come from the proof manifests; its selected covenant state is fetched live from StudioNet. The independent historical replay is not an upstream maintainer promise.
 
 ## Safety and accounting
 
@@ -58,9 +62,9 @@ All consensus-critical source values are copied to locals before the nondetermin
 ## Live replay and remaining gates
 
 1. The [historical replay fixture](deploy/demo-fixture.json) pins three real upstream commits and exact `pyproject.toml` quotes for Python 3.10 support, removal, and restoration. Run `pnpm verify:fixture` to recheck raw bytes and quotes. This replay is independent and is not a promise by the upstream maintainer.
-2. [Repair-path proof](deploy/proof.json) records a finalized `BREAK` and an active 1 GEN pool. The first challenge window closes at its recorded UTC timestamp; the maintainer may then submit the repair commit. Its repair verdict, settlement, and withdrawal still need live receipts.
-3. [Refund-path proof](deploy/refund-proof.json) records another finalized `BREAK`, sponsorship, and a finalized duplicate-challenge rollback. No revision will be submitted to this instance. Settlement, refund claim, and withdrawal still need live receipts after the revision deadline.
+2. [Fresh repair-path proof](deploy/repair-proof.json) records a finalized `BREAK` and an active 1 GEN pool. Its first challenge window closes at 2026-10-20 15:10 UTC (16:10 Lagos). The maintainer may then submit the pinned repair commit before 15:20 UTC; final settlement is available at 15:30 UTC. These future steps require live receipts.
+3. [Timeout-path proof](deploy/refund-proof.json) records a finalized `BREAK`, sponsorship, a finalized duplicate-challenge rollback, `REFUND` settlement, sponsor claim, and withdrawal. [The original repair attempt](deploy/proof.json) missed its revision window and followed the same deterministic refund path. It is retained as an honest record, not presented as a completed repair.
 4. A real browser wallet test of the hosted app's deploy, fund, act, claim, and appeal controls remains. Studio's funded test accounts exercised the contract directly, while the public read path was tested in the hosted app.
-5. Publish a public source repository and make the Site reviewable only after the live receipts and docs are complete. The operator must submit the Portal form.
+5. Review the [public source repository](https://github.com/smokexbadlines-dot/release-covenant-genlayer), including the [deployed source commit](https://github.com/smokexbadlines-dot/release-covenant-genlayer/commit/be7aaabf1c2510b95a5951f73300edacff2415fd) and final receipts. The Site is public. The operator must submit the Portal form.
 
 For a code walk-through, see [tutorial.md](tutorial.md). GenLayer API references: [nondeterministic operations](https://docs.genlayer.com/understand-genlayer-protocol/core-concepts/non-deterministic-operations-handling), [storage](https://docs.genlayer.com/developers/intelligent-contracts/storage), [value transfers](https://docs.genlayer.com/developers/intelligent-contracts/features/value-transfers), [StudioNet](https://docs.genlayer.com/developers/networks), [direct-mode testing](https://docs.genlayer.com/developers/intelligent-contracts/testing).

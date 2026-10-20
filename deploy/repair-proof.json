@@ -1,0 +1,34 @@
+{
+  "status": "deployed",
+  "workflow_status": "repair_challenge_awaiting_first_close",
+  "network": "studionet",
+  "contract_address": "0x73F1Fc96b0bb6B07E7D6158Cc50c7C2cC58c01cD",
+  "source_sha256": "43db99346e657764460d52753b9176a570d63713b0cd07d15c90acb4fdc269bd",
+  "source_commit_at_deploy": "be7aaabf1c2510b95a5951f73300edacff2415fd",
+  "fixture": "deploy/demo-fixture.json",
+  "constructor": {
+    "repo": "facelessuser/pymdown-extensions",
+    "baseline_sha": "848c5029ada0a8c13bf725c3421ddbd2633fb1eb",
+    "release_sha": "ff07dc2722d1ea9c1fc780355fd39b329929570a",
+    "first_close": 1792509000,
+    "revision_deadline": 1792509600,
+    "final_close": 1792510200
+  },
+  "transactions": [
+    {"label": "deploy repair covenant", "hash": "0x4405ce73ac386c818b082afd1d8ed3b2ebb10ae27c6908693888dcf0c81fe23a"},
+    {"label": "record promise", "hash": "0xeba3612803bf44452623a4847c372cee44352e0941a2008a3efb71245a660af0"},
+    {"label": "seal promise", "hash": "0x91eaf1e4552a32053a88cd08d23b0f7e7669abf6223218757a35623bb8ca9e7d"},
+    {"label": "sponsor 1 GEN", "hash": "0x593d9811d53d56d6ad5441871f3c4b1d225b38c4a0ffa837f578c366b09c011e"},
+    {"label": "upheld Python 3.10 break", "hash": "0x0560564724b64940b3fc565bcfbadef8d435e34699629732c04ae1c085125078", "expected_result": "BREAK", "minimum_agree_votes": 2}
+  ],
+  "expected_snapshot": {
+    "sealed": true,
+    "round": 1,
+    "outcome": "PENDING",
+    "total_sponsored_wei": "1000000000000000000"
+  },
+  "expected_promise_states": ["OPEN"],
+  "expected_accounts": [
+    {"address": "0xbb3B64fE0B393C5E0Dbc119e3D88f6c1e28Efa44", "deposited_wei": "1000000000000000000", "claimable_wei": "0"}
+  ]
+}

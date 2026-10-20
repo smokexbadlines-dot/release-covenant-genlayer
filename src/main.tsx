@@ -10,6 +10,10 @@ import {
 } from './genlayer';
 import type { AccountSnapshot, Action, CovenantSnapshot, Network, TrackedTransaction } from './types';
 import recordedProof from '../deploy/proof.json';
+import repairProof from '../deploy/repair-proof.json';
+import refundProof from '../deploy/refund-proof.json';
+import negativeProof from '../deploy/negative-proof.json';
+import lateCreditProof from '../deploy/late-credit-proof.json';
 import './styles.css';
 
 const TX_KEY = 'release-covenant-transactions-v1';
@@ -18,6 +22,13 @@ const networkNames: Record<Network, string> = { studionet: 'StudioNet' };
 const explorerBase: Record<Network, string> = {
   studionet: 'https://explorer-studio.genlayer.com',
 };
+const proofCases = [
+  { title: 'Repair attempt', manifest: repairProof },
+  { title: 'Missed revision refund', manifest: recordedProof },
+  { title: 'Timeout and refund', manifest: refundProof },
+  { title: 'Missing quote', manifest: negativeProof },
+  { title: 'Late credit recovery', manifest: lateCreditProof },
+] as const;
 
 function restoreTransactions(): TrackedTransaction[] {
   try {
@@ -48,7 +59,7 @@ const actionLabels: Record<Action, string> = {
 
 function App() {
   const network: Network = 'studionet';
-  const [addressInput, setAddressInput] = useState(localStorage.getItem(ADDRESS_KEY) || recordedProof.contract_address);
+  const [addressInput, setAddressInput] = useState(localStorage.getItem(ADDRESS_KEY) || repairProof.contract_address);
   const [address, setAddress] = useState<`0x${string}` | null>(null);
   const [account, setAccount] = useState<`0x${string}` | null>(null);
   const [snapshot, setSnapshot] = useState<CovenantSnapshot | null>(null);
@@ -86,7 +97,7 @@ function App() {
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const candidate = params.get('contract') || localStorage.getItem(ADDRESS_KEY) || recordedProof.contract_address;
+    const candidate = params.get('contract') || localStorage.getItem(ADDRESS_KEY) || repairProof.contract_address;
     if (validAddress(candidate)) {
       setAddress(candidate);
       setAddressInput(candidate);
@@ -300,8 +311,8 @@ function App() {
       </section>
 
       <section className="proof-section" aria-label="Recorded on-chain demo">
-        <div className="proof-heading"><div><div className="section-kicker">RECORDED PROOF · STUDIONET</div><h2>An objection, upheld<span className="green-dot">.</span></h2><p>This is a historical replay of public upstream commits by an independent operator. It is not a promise from that repository’s maintainer.</p></div><a href={`${explorerBase.studionet}/address/${recordedProof.contract_address}`} target="_blank" rel="noreferrer">View contract <ArrowUpRight size={15} /></a></div>
-        <div className="proof-card"><div className="proof-card-top"><span>RECORDED RECEIPTS</span><strong>{recordedProof.workflow_status.replaceAll('_', ' ')}</strong></div><div className="proof-receipts">{recordedProof.transactions.map(item => <a key={item.hash} href={`${explorerBase.studionet}/tx/${item.hash}`} target="_blank" rel="noreferrer"><span>{item.label}</span><small>{short(item.hash, 7)} · FINALIZED / SUCCESS</small><ArrowUpRight size={14} /></a>)}</div><p>The receipt list comes from the saved proof manifest. The contract state above is fetched live from the latest finalized chain state; it can advance beyond these recorded receipts.</p></div>
+        <div className="proof-heading"><div><div className="section-kicker">RECORDED PROOF · STUDIONET</div><h2>An objection, upheld<span className="green-dot">.</span></h2><p>This is a historical replay of public upstream commits by an independent operator. It is not a promise from that repository’s maintainer. The Explore view above reads the selected contract's latest finalized state.</p></div></div>
+        <div className="proof-grid">{proofCases.map(({ title, manifest }) => <div className="proof-card" key={title}><div className="proof-card-top"><span>{title}</span><strong>{manifest.workflow_status.replaceAll('_', ' ')}</strong></div><div className="proof-contract-links"><a href={`?contract=${manifest.contract_address}`}>Read live state <ArrowUpRight size={13} /></a><a href={`${explorerBase.studionet}/address/${manifest.contract_address}`} target="_blank" rel="noreferrer">Contract explorer <ArrowUpRight size={13} /></a></div><div className="proof-receipts">{manifest.transactions.map(item => <a key={item.hash} href={`${explorerBase.studionet}/tx/${item.hash}`} target="_blank" rel="noreferrer"><span>{item.label}</span><small>{short(item.hash, 7)} · FINALIZED / {'expected_execution' in item && item.expected_execution === 'ERROR' ? 'EXPECTED ERROR' : 'SUCCESS'}</small><ArrowUpRight size={14} /></a>)}</div><p>Recorded receipts from the proof manifest. The live view reads finalized chain state separately.</p></div>)}</div>
       </section>
 
       <section className="activity-section"><div className="activity-heading"><div><div className="section-kicker">CONSENSUS ACTIVITY</div><h2>Transaction trail<span className="green-dot">.</span></h2><p>Saved in this browser so pending transactions resume after reload.</p></div><span className="activity-count">{latest.length} RECENT</span></div>{latest.length ? <div className="activity-list">{latest.map(tx => <div className="activity-item" key={tx.hash}><div className={`activity-icon ${tx.status.toLowerCase()}`}>{tx.status === 'FINALIZED' && tx.execution === 'SUCCESS' ? <Check size={18} /> : <Clock3 size={18} />}</div><div className="activity-main"><strong>{tx.action}</strong><small>{new Date(tx.submittedAt).toLocaleString()} · {short(tx.hash, 9)}</small></div><div className="activity-state"><strong>{tx.status.replaceAll('_', ' ')}</strong><small>{tx.execution.replaceAll('_', ' ')}</small></div><div className="activity-links"><a href={`${explorerBase[tx.network]}/tx/${tx.hash}`} target="_blank" rel="noreferrer" aria-label="View transaction in explorer"><ArrowUpRight size={17} /></a>{tx.status === 'ACCEPTED' && <button disabled={busy} onClick={() => void handleAppeal(tx.hash)}>Appeal</button>}</div></div>)}</div> : <div className="activity-empty">No locally tracked transactions yet. Submitted writes will appear here.</div>}</section>

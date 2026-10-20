@@ -1,6 +1,6 @@
 {
   "status": "deployed",
-  "workflow_status": "open_challenge_awaiting_revision_window",
+  "workflow_status": "revision_window_missed_refund_withdrawn",
   "network": "studionet",
   "contract_address": "0xA001240a6DFA94492678F11Aed8FC23f7c4600f3",
   "source_sha256": "43db99346e657764460d52753b9176a570d63713b0cd07d15c90acb4fdc269bd",
@@ -19,16 +19,19 @@
     {"label": "record promise", "hash": "0x178e690fd791ddcd286957b18d03c0eb8ec81377d7ba1cff4b7b5159b4168d76"},
     {"label": "seal promise", "hash": "0x1d61c7d822b61306af012591f3b4c02a45ca14cf5435e21446fee4b30cd48b0b"},
     {"label": "sponsor 1 GEN", "hash": "0x78062144ec39efbcfb9d540a4fef6c340fc20770dbbcd3142dd2c4bd4c25d87c"},
-    {"label": "upheld Python 3.10 break", "hash": "0xcbeface54701eac7186b73920893db57bc099b150fa4c68c7d33d77612aac30f", "expected_result": "BREAK", "minimum_agree_votes": 2}
+    {"label": "upheld Python 3.10 break", "hash": "0xcbeface54701eac7186b73920893db57bc099b150fa4c68c7d33d77612aac30f", "expected_result": "BREAK", "minimum_agree_votes": 2},
+    {"label": "missed revision settles refund", "hash": "0x10ba40cab4c52875f76a50aeac86b99db6ea062d15b480bb98d44b7d6ce98249", "expected_result": "REFUND", "minimum_agree_votes": 2},
+    {"label": "sponsor claims missed-window refund", "hash": "0x1b39d4af6f8ef8ee291fa466075e4597a5b55bec180ce411e55f504350f2e69a"},
+    {"label": "sponsor withdraws missed-window refund", "hash": "0x05ab58d349fc7d98eba9f8f4088bad9213a75d277d36234a867c45c7510bd526"}
   ],
   "expected_snapshot": {
     "sealed": true,
     "round": 1,
-    "outcome": "PENDING",
+    "outcome": "REFUND",
     "total_sponsored_wei": "1000000000000000000"
   },
   "expected_promise_states": ["OPEN"],
   "expected_accounts": [
-    {"address": "0xbb3B64fE0B393C5E0Dbc119e3D88f6c1e28Efa44", "deposited_wei": "1000000000000000000", "claimable_wei": "0"}
+    {"address": "0xbb3B64fE0B393C5E0Dbc119e3D88f6c1e28Efa44", "deposited_wei": "0", "claimable_wei": "0"}
   ]
 }

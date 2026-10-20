@@ -9,8 +9,10 @@
     "verify:fixture": "node deploy/verify-fixture.mjs",
     "verify:probe": "node deploy/verify-probe.mjs",
     "verify:proof": "node deploy/verify-proof.mjs",
+    "verify:repair": "node deploy/verify-proof.mjs ./repair-proof.json",
     "verify:refund": "node deploy/verify-proof.mjs ./refund-proof.json",
-    "verify:late-credit": "node deploy/verify-proof.mjs ./late-credit-proof.json"
+    "verify:late-credit": "node deploy/verify-proof.mjs ./late-credit-proof.json",
+    "verify:negative": "node deploy/verify-proof.mjs ./negative-proof.json"
   },
   "dependencies": {
     "genlayer-js": "^1.1.8",

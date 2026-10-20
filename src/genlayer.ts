@@ -32,14 +32,14 @@ export function readClient(network: Network) {
 }
 
 export async function walletClient(network: Network, account: `0x${string}`) {
-  if (!window.ethereum) throw new Error('No browser wallet was found. Install or open an EIP-1193 wallet.');
+  if (!window.ethereum) throw new Error('MetaMask was not found in this browser. Install or enable MetaMask, then reload.');
   const client = createClient({ chain: chainFor(network), account, provider: window.ethereum });
   await client.connect(network);
   return client;
 }
 
 export async function connectWallet(network: Network): Promise<`0x${string}`> {
-  if (!window.ethereum) throw new Error('No browser wallet was found. Install or open an EIP-1193 wallet.');
+  if (!window.ethereum) throw new Error('MetaMask was not found in this browser. Install or enable MetaMask, then reload.');
   const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
   const account = Array.isArray(accounts) ? accounts[0] : undefined;
   if (typeof account !== 'string' || !validAddress(account)) throw new Error('Wallet did not return a valid address.');

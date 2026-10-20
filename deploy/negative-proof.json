@@ -1,0 +1,17 @@
+{
+  "status": "deployed",
+  "workflow_status": "missing_exact_quote_rejected_without_state_change",
+  "network": "studionet",
+  "contract_address": "0x33D2cbd86094800cAB3aAF352519917cA8D812E7",
+  "source_sha256": "43db99346e657764460d52753b9176a570d63713b0cd07d15c90acb4fdc269bd",
+  "source_commit_at_deploy": "32c64dec6756da7ff427a6df9b237c2f1bce4024",
+  "fixture": "deploy/demo-fixture.json",
+  "transactions": [
+    {"label": "deploy evidence-test covenant", "hash": "0xd586a13d9d6c9826e69642c3da30879db2f3cc46516c157aa6c31af5b98bf3c9"},
+    {"label": "record promise", "hash": "0xe3c9b0107af10705d5a836177bcb0d16220d278ad1778acf903c5b04a865033e"},
+    {"label": "seal promise", "hash": "0xa9ec7eff700e4db6919eb8cb1b7e538c2f552e90244c0eb53d580780dac390dd"},
+    {"label": "absent quote returns insufficient", "hash": "0x6f2fa46be3523c39706184caa7c7d61686f953e4c8f58464ba2c7001c98924d1", "expected_result": "INSUFFICIENT", "minimum_agree_votes": 2}
+  ],
+  "expected_snapshot": {"sealed": true, "round": 1, "outcome": "PENDING", "total_sponsored_wei": "0"},
+  "expected_promise_states": ["CLEAN"]
+}
