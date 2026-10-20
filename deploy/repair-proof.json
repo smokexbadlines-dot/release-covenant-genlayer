@@ -1,6 +1,6 @@
 {
   "status": "deployed",
-  "workflow_status": "repair_challenge_awaiting_first_close",
+  "workflow_status": "repair_verified_awaiting_final_close",
   "network": "studionet",
   "contract_address": "0x73F1Fc96b0bb6B07E7D6158Cc50c7C2cC58c01cD",
   "source_sha256": "43db99346e657764460d52753b9176a570d63713b0cd07d15c90acb4fdc269bd",
@@ -19,15 +19,18 @@
     {"label": "record promise", "hash": "0xeba3612803bf44452623a4847c372cee44352e0941a2008a3efb71245a660af0"},
     {"label": "seal promise", "hash": "0x91eaf1e4552a32053a88cd08d23b0f7e7669abf6223218757a35623bb8ca9e7d"},
     {"label": "sponsor 1 GEN", "hash": "0x593d9811d53d56d6ad5441871f3c4b1d225b38c4a0ffa837f578c366b09c011e"},
-    {"label": "upheld Python 3.10 break", "hash": "0x0560564724b64940b3fc565bcfbadef8d435e34699629732c04ae1c085125078", "expected_result": "BREAK", "minimum_agree_votes": 2}
+    {"label": "upheld Python 3.10 break", "hash": "0x0560564724b64940b3fc565bcfbadef8d435e34699629732c04ae1c085125078", "expected_result": "BREAK", "minimum_agree_votes": 2},
+    {"label": "pin one repair revision", "hash": "0x41272b62e6b60e1d77bb8856d482de6897a97f28ca3f92d10a805ca000212006", "minimum_agree_votes": 2},
+    {"label": "affirmatively verify repair", "hash": "0xc9de117e53a1b6e272377b527fa35c817479d1f5d21c0d31ef883f562baa4a69", "expected_result": "REPAIRED", "minimum_agree_votes": 2}
   ],
   "expected_snapshot": {
     "sealed": true,
-    "round": 1,
+    "round": 2,
     "outcome": "PENDING",
+    "release_sha": "11fbe9f174beff658efaa05c958257e69c147aa3",
     "total_sponsored_wei": "1000000000000000000"
   },
-  "expected_promise_states": ["OPEN"],
+  "expected_promise_states": ["REPAIRED"],
   "expected_accounts": [
     {"address": "0xbb3B64fE0B393C5E0Dbc119e3D88f6c1e28Efa44", "deposited_wei": "1000000000000000000", "claimable_wei": "0"}
   ]
