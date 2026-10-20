@@ -319,7 +319,7 @@ function App() {
 
       <section className="closing-strip"><div><div className="section-kicker">DESIGNED FOR ACCOUNTABILITY</div><h2>Every objection has a path.<br /><em>Every path has an end.</em></h2></div><div><p>Validators interpret a bounded public claim. The contract enforces one revision, two challenge windows, and deterministic payment or refunds.</p><a href="https://docs.genlayer.com/understand-genlayer-protocol/core-concepts/non-deterministic-operations-handling" target="_blank" rel="noreferrer">How GenLayer judges <ArrowUpRight size={16} /></a></div></section>
     </main>
-    <footer><div className="brand"><span className="brand-mark"><Layers3 size={16} /></span><span>release<span className="brand-accent">covenant</span></span></div><span>Built for GenLayer · Source and contract included</span><span>StudioNet demo · Check receipt links above</span></footer>
+    <footer><div className="brand"><span className="brand-mark"><Layers3 size={16} /></span><span>release<span className="brand-accent">covenant</span></span></div><a href="https://github.com/smokexbadlines-dot/release-covenant-genlayer" target="_blank" rel="noreferrer">Public source and proof</a><span>StudioNet demo · Check receipt links above</span></footer>
   </div>;
 }
 
