@@ -33,6 +33,11 @@ export function readClient(network: Network) {
 
 export async function walletClient(network: Network, account: `0x${string}`) {
   if (!window.ethereum) throw new Error('MetaMask was not found in this browser. Install or enable MetaMask, then reload.');
+  const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+  const active = Array.isArray(accounts) ? accounts[0] : undefined;
+  if (typeof active !== 'string' || active.toLowerCase() !== account.toLowerCase()) {
+    throw new Error('The active MetaMask account changed. Reconnect the wallet before writing.');
+  }
   const client = createClient({ chain: chainFor(network), account, provider: window.ethereum });
   await client.connect(network);
   return client;

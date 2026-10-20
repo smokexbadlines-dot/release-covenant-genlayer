@@ -14,6 +14,7 @@ import repairProof from '../deploy/repair-proof.json';
 import refundProof from '../deploy/refund-proof.json';
 import negativeProof from '../deploy/negative-proof.json';
 import lateCreditProof from '../deploy/late-credit-proof.json';
+import walletProof from '../deploy/wallet-proof.json';
 import './styles.css';
 
 const TX_KEY = 'release-covenant-transactions-v1';
@@ -28,6 +29,7 @@ const proofCases = [
   { title: 'Timeout and refund', manifest: refundProof },
   { title: 'Missing quote', manifest: negativeProof },
   { title: 'Late credit recovery', manifest: lateCreditProof },
+  { title: 'Browser wallet flow', manifest: walletProof },
 ] as const;
 
 function restoreTransactions(): TrackedTransaction[] {
@@ -127,6 +129,9 @@ function App() {
             setAddress(item.contractAddress);
             setAddressInput(item.contractAddress);
             localStorage.setItem(ADDRESS_KEY, item.contractAddress);
+            const params = new URLSearchParams(location.search);
+            params.set('contract', item.contractAddress);
+            history.replaceState(null, '', `${location.pathname}?${params}`);
           }
           if (address) void refresh(address, network, account);
         }
@@ -262,8 +267,8 @@ function App() {
     <header className="topbar">
       <div className="brand"><span className="brand-mark"><Layers3 size={19} strokeWidth={2.4} /></span><span>release<span className="brand-accent">covenant</span></span></div>
       <div className="topbar-actions">
-        <span className="network-select"><span className="network-dot" /><span>StudioNet</span></span>
-        <button className="wallet-button" onClick={handleConnect}><Wallet size={15} />{account ? short(account, 5) : 'Connect wallet'}</button>
+        <span className="network-select" title="StudioNet test network" aria-label="StudioNet test network"><span className="network-dot" /><span>StudioNet</span></span>
+        <button className={`wallet-button${account ? ' connected' : ''}`} aria-label={account ? `Connected wallet ${account}. Click to reconnect.` : 'Connect wallet'} onClick={handleConnect}><Wallet size={15} />{account ? short(account, 5) : 'Connect wallet'}</button>
       </div>
     </header>
 

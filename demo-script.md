@@ -10,4 +10,4 @@ The [public app](https://release-covenant-genlayer-20261020.opalfairy1.chatgpt.s
 
 **1:25–1:50 — Show the cure gate.** The [repair proof](deploy/repair-proof.json) shows the maintainer's revision after first close, the carried objection's separate `REPAIRED` verdict, `PAY` settlement after final close, and the 1 test GEN withdrawal. Open each finalized receipt.
 
-**1:50–2:00 — Verify.** Run `pnpm verify:fixture`, `pnpm verify:probe`, `pnpm verify:repair`, `pnpm verify:proof`, `pnpm verify:refund`, `pnpm verify:negative`, and `pnpm verify:late-credit`. These commands read StudioNet; they do not submit transactions.
+**1:50–2:00 — Verify.** The Browser wallet flow card links finalized public-app deploy, fund, challenge, refund, claim, and withdrawal receipts. Run `pnpm verify:wallet` with the other `verify:*` scripts for independent read-only StudioNet checks.

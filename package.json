@@ -12,7 +12,8 @@
     "verify:repair": "node deploy/verify-proof.mjs ./repair-proof.json",
     "verify:refund": "node deploy/verify-proof.mjs ./refund-proof.json",
     "verify:late-credit": "node deploy/verify-proof.mjs ./late-credit-proof.json",
-    "verify:negative": "node deploy/verify-proof.mjs ./negative-proof.json"
+    "verify:negative": "node deploy/verify-proof.mjs ./negative-proof.json",
+    "verify:wallet": "node deploy/verify-proof.mjs ./wallet-proof.json"
   },
   "dependencies": {
     "genlayer-js": "^1.1.8",

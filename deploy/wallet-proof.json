@@ -1,0 +1,25 @@
+{
+  "status": "deployed",
+  "workflow_status": "browser_wallet_break_refund_claimed_withdrawn",
+  "network": "studionet",
+  "contract_address": "0x4d0a6f9e3998e14C3f7e48EE54560f9Fb6cbB2f9",
+  "source_sha256": "43db99346e657764460d52753b9176a570d63713b0cd07d15c90acb4fdc269bd",
+  "source_commit_at_deploy": "706bcc2185e0894be030596ef247a116edec04fd",
+  "fixture": "deploy/demo-fixture.json",
+  "wallet_address": "0x106E2A74C9233e1981b0B5692355163A825F4422",
+  "transactions": [
+    {"label": "browser wallet deploys covenant", "hash": "0x210c7094dace1e9211b2e8256146282f765eb5b8882ce8a88201445e6c7ba84e"},
+    {"label": "browser wallet records promise", "hash": "0x83d97e8db4d3ee2fbc6597d759487cbdbb17bb9100b756006fd1ea347d826a0f"},
+    {"label": "browser wallet seals promise", "hash": "0x59040fe5828c496556b2430a38cfd8fd312c71f47d151f61b0768ecab8bdfa4b"},
+    {"label": "browser wallet sponsors 0.01 test GEN", "hash": "0x64951d623aed350c33425c61577130ec445df3cec0b4507dbf1da542ef73a1df"},
+    {"label": "browser wallet challenge upheld", "hash": "0xb7dfb1d31611ecf3f80edac5c880884c5c5d31cf2ec28fc5817709e002892bec", "expected_result": "BREAK", "minimum_agree_votes": 3},
+    {"label": "browser wallet settles refund", "hash": "0x83415929bea547fcd32c52c7b69dc8ed21fc5586590f212eb783781b0f8bd893", "expected_result": "REFUND", "minimum_agree_votes": 3},
+    {"label": "browser wallet claims refund", "hash": "0x4034238314dbe3735e3053c113a8531cb10ac017bdb6c6bc9194275eb606e89c"},
+    {"label": "browser wallet withdraws 0.01 test GEN", "hash": "0xc59662a5e6c3fc63a76ee1d11d6980acc96fc2fbaac9a6476540d90925f5546a"}
+  ],
+  "expected_snapshot": {"sealed": true, "round": 1, "outcome": "REFUND", "total_sponsored_wei": "10000000000000000"},
+  "expected_promise_states": ["OPEN"],
+  "expected_accounts": [
+    {"address": "0x106E2A74C9233e1981b0B5692355163A825F4422", "deposited_wei": "0", "claimable_wei": "0"}
+  ]
+}
