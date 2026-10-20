@@ -17,7 +17,7 @@
 1. Open the public app. Its Explore view loads the recorded covenant from finalized StudioNet state without a wallet.
 2. Inspect the promise, baseline and release quotes, one-GEN pool, and current outcome. Open the raw commit-pinned evidence links.
 3. Open the challenge, revision, repair, settlement, and withdrawal receipts from the Recorded proof panel. Check transaction finality and leader execution separately. Inspect the two refund cases and expected duplicate rollback.
-4. Open the public repository; run `pnpm install`, then `pnpm verify:fixture`, `pnpm verify:probe`, `pnpm verify:proof`, `pnpm verify:refund`, and `pnpm verify:repair` for independent read-only checks.
+4. Open the public repository; run `pnpm install`, then the `verify:fixture`, `verify:probe`, `verify:repair`, `verify:proof`, `verify:refund`, `verify:negative`, and `verify:late-credit` scripts for independent read-only checks.
 
 **Expected outcome:** The repair-path covenant carried an objection into round two, accepted an affirmative `REPAIRED` verdict, settled `PAY`, and let the maintainer withdraw exactly 1 test GEN. The two separate missed-revision cases left objections open, settled `REFUND`, and let sponsors claim and withdraw exact deposits. The duplicate challenge finalized as an expected rollback with no changed state.
 

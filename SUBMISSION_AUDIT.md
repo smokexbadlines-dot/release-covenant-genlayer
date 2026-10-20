@@ -10,10 +10,10 @@ Checked against the live GenLayer Portal **Builder → Projects** form on 2026-1
 - The timeout path has a finalized expected rollback for an attempted duplicate challenge. The negative-evidence path finalized `INSUFFICIENT` for a quote missing from the pinned file and left the promise clean. `pnpm verify:negative` checks the latter.
 - The late-payable path finalized a refundable credit, withdrawal, and an empty-pool settlement. `pnpm verify:late-credit` checks it.
 - The public Site opens outside the owner session. Its Explore view loads latest-finalized StudioNet state without a wallet and labels recorded receipts separately. The app source has native wallet writes, transaction polling across reloads, and native appeal support.
+- The [public GitHub repository](https://github.com/smokexbadlines-dot/release-covenant-genlayer) includes the deployed source commit and final proof manifests. The public Site includes a source link. The user explicitly approved public source and Site publication.
 
 ## Gates still open
 
-- Final proof manifests and updated source in the [public GitHub repository](https://github.com/smokexbadlines-dot/release-covenant-genlayer). The user explicitly approved public source and Site publication.
 - Real browser-wallet write, claim, and appeal test. Studio's funded accounts have exercised the contract directly. In the available Chrome profile, `window.ethereum` was absent on the local app, so wallet-originated actions are not yet demonstrated. An appealable transaction has not been created solely to test appeals.
 - The human owner must submit the Portal form. This repository supplies a draft; it does not submit the form.
 
