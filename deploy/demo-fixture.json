@@ -1,0 +1,13 @@
+{
+  "kind": "historical_replay",
+  "notice": "Independent replay of public upstream history; not affiliated with the repository owner and not a live release promise by them.",
+  "repo": "facelessuser/pymdown-extensions",
+  "baseline_sha": "848c5029ada0a8c13bf725c3421ddbd2633fb1eb",
+  "break_sha": "ff07dc2722d1ea9c1fc780355fd39b329929570a",
+  "repair_sha": "11fbe9f174beff658efaa05c958257e69c147aa3",
+  "promise": "The package remains installable on Python 3.10.",
+  "path": "pyproject.toml",
+  "baseline_quote": "requires-python = \">=3.10\"",
+  "break_quote": "requires-python = \">=3.11\"",
+  "repair_quote": "requires-python = \">=3.10\""
+}

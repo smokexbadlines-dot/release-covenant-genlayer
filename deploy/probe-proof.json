@@ -1,0 +1,29 @@
+{
+  "status": "deployed",
+  "network": "studionet",
+  "contract_address": "0xD200D4401f815C31a0568245cD65C944b3eFDeeD",
+  "source_sha256": "d12c7b3136914cc81722a40736753a5c0aed78ff45fd432f10cfb5460c459984",
+  "transactions": [
+    {
+      "label": "deploy probe",
+      "hash": "0x968d2a977743d99cfde03d2d393b68731fe41346a8c0ddf3a87a601183ac66bb",
+      "expected_result": null
+    },
+    {
+      "label": "baseline quote fetch",
+      "hash": "0x47032e31639472ed88aa29ae26ae5c039a63681d4d570fb708b4122065541ac6",
+      "expected_result": "FOUND"
+    },
+    {
+      "label": "break quote fetch",
+      "hash": "0xf7496460da4f476d20e71f94e2ae2855bf20317dcb08561c3f7585be4d436d11",
+      "expected_result": "FOUND"
+    },
+    {
+      "label": "repair quote fetch",
+      "hash": "0x34376ad72ce6372b67b68f2738026f4a91f94a55f9fd69675d21d1c9de8ab68c",
+      "expected_result": "FOUND"
+    }
+  ],
+  "expected_finalized_readback": "2:FOUND"
+}

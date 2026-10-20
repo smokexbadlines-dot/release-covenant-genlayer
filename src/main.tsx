@@ -9,6 +9,7 @@ import {
   readAccount, readCovenant, submitWrite, transactionStatus, validAddress,
 } from './genlayer';
 import type { AccountSnapshot, Action, CovenantSnapshot, Network, TrackedTransaction } from './types';
+import recordedProof from '../deploy/proof.json';
 import './styles.css';
 
 const TX_KEY = 'release-covenant-transactions-v1';
@@ -47,7 +48,7 @@ const actionLabels: Record<Action, string> = {
 
 function App() {
   const network: Network = 'studionet';
-  const [addressInput, setAddressInput] = useState(localStorage.getItem(ADDRESS_KEY) || '');
+  const [addressInput, setAddressInput] = useState(localStorage.getItem(ADDRESS_KEY) || recordedProof.contract_address);
   const [address, setAddress] = useState<`0x${string}` | null>(null);
   const [account, setAccount] = useState<`0x${string}` | null>(null);
   const [snapshot, setSnapshot] = useState<CovenantSnapshot | null>(null);
@@ -60,8 +61,13 @@ function App() {
   const [mode, setMode] = useState<'explore' | 'create'>('explore');
   const [action, setAction] = useState<Action>('challenge');
   const [copied, setCopied] = useState(false);
+  const [clockSeconds, setClockSeconds] = useState(() => Date.now() / 1000);
 
   useEffect(() => { localStorage.setItem(TX_KEY, JSON.stringify(transactions)); }, [transactions]);
+  useEffect(() => {
+    const timer = setInterval(() => setClockSeconds(Date.now() / 1000), 15000);
+    return () => clearInterval(timer);
+  }, []);
 
   const refresh = useCallback(async (nextAddress = address, nextNetwork = network, nextAccount = account) => {
     if (!nextAddress) return;
@@ -80,7 +86,7 @@ function App() {
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const candidate = params.get('contract') || localStorage.getItem(ADDRESS_KEY) || '';
+    const candidate = params.get('contract') || localStorage.getItem(ADDRESS_KEY) || recordedProof.contract_address;
     if (validAddress(candidate)) {
       setAddress(candidate);
       setAddressInput(candidate);
@@ -104,8 +110,9 @@ function App() {
         return found ? { ...tx, status: found.status, execution: found.execution } : tx;
       }));
       for (const item of updates) {
-        if (item?.status === 'FINALIZED' && item.execution === 'FINISHED_WITH_RETURN') {
-          if (item.contractAddress && validAddress(item.contractAddress)) {
+        if (item?.status === 'FINALIZED' && item.execution === 'SUCCESS') {
+          const tracked = transactions.find(tx => tx.hash === item.hash);
+          if (tracked?.action === 'Deploy covenant' && item.contractAddress && validAddress(item.contractAddress)) {
             setAddress(item.contractAddress);
             setAddressInput(item.contractAddress);
             localStorage.setItem(ADDRESS_KEY, item.contractAddress);
@@ -126,7 +133,7 @@ function App() {
 
   const availableActions = useMemo<Action[]>(() => {
     if (!snapshot) return [];
-    const now = Date.now() / 1000;
+    const now = clockSeconds;
     const values: Action[] = [];
     if (snapshot.outcome === 'PENDING') {
       if (!snapshot.sealed && isMaintainer && now < snapshot.first_close) values.push('add_promise', 'seal');
@@ -141,7 +148,7 @@ function App() {
     if (snapshot.outcome === 'REFUND' && accountState && BigInt(accountState.deposited_wei) > 0n) values.push('claim_refund');
     if (accountState && BigInt(accountState.claimable_wei) > 0n) values.push('withdraw');
     return values;
-  }, [snapshot, isMaintainer, openCount, accountState]);
+  }, [snapshot, isMaintainer, openCount, accountState, clockSeconds]);
 
   useEffect(() => {
     if (availableActions.length && !availableActions.includes(action)) setAction(availableActions[0]);
@@ -199,8 +206,9 @@ function App() {
 
   const handleAction = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault(); setError(''); setNotice('');
+    const form = event.currentTarget;
     if (!address || !account) { setError('Load a contract and connect a wallet first.'); return; }
-    const fields = new FormData(event.currentTarget);
+    const fields = new FormData(form);
     const string = (key: string) => String(fields.get(key) || '').trim();
     const index = Number(string('index'));
     let args: (string | number | bigint)[] = [];
@@ -217,7 +225,7 @@ function App() {
       if (action === 'revise' && !/^[0-9a-fA-F]{40}$/.test(string('sha'))) throw new Error('Use a full 40-character commit SHA.');
       setBusy(true);
       track(await submitWrite(network, address, account, action, args, value), actionLabels[action]);
-      event.currentTarget.reset();
+      form.reset();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Transaction could not be submitted.');
     } finally { setBusy(false); }
@@ -279,7 +287,7 @@ function App() {
         {mode === 'create' ? <div className="workspace-grid create-grid"><div className="panel create-panel"><div className="panel-top"><span className="panel-tag">01 · NEW COVENANT</span><Code2 size={18} /></div><h3>Commit to a release.</h3><p className="panel-intro">Deploy a covenant, then add up to four promises and seal it before the first challenge window closes.</p><form onSubmit={handleDeploy} className="field-grid"><label className="full">GitHub repository <span>owner/repo</span><input name="repo" placeholder="your-org/your-project" required /></label><label>Baseline commit SHA<input name="baseline" placeholder="40-character SHA" minLength={40} maxLength={40} required /></label><label>Candidate release SHA<input name="release" placeholder="40-character SHA" minLength={40} maxLength={40} required /></label><label>First challenge closes<input name="first" type="datetime-local" defaultValue={datetimeInput(1)} required /></label><label>Revision deadline<input name="revision" type="datetime-local" defaultValue={datetimeInput(2)} required /></label><label className="full">Final challenge closes<input name="final" type="datetime-local" defaultValue={datetimeInput(3)} required /></label><div className="form-footer"><span>Wallet deploys on {networkNames[network]}. Transactions require test GEN.</span><button className="primary-button" disabled={busy}>{busy ? 'Waiting for wallet…' : 'Deploy covenant'} <ArrowRight size={16} /></button></div></form></div><aside className="panel aside-panel"><div className="panel-tag">HOW IT WORKS</div><div className="mini-step"><span>01</span><div><strong>Publish the terms</strong><p>Freeze a baseline commit and clear compatibility promises.</p></div></div><div className="mini-step"><span>02</span><div><strong>Open to challenge</strong><p>Sponsors fund. Anyone cites a precise breaking change at the release commit.</p></div></div><div className="mini-step"><span>03</span><div><strong>Repair or refund</strong><p>One new commit gets another challenge round. Unresolved objections refund sponsors.</p></div></div><p className="aside-note">The contract checks cited quotes and asks validators to interpret a narrow contradiction. It does not audit all code.</p></aside></div> : <>
           <div className="load-row"><form onSubmit={loadContract} className="address-form"><Link2 size={17} /><input aria-label="Contract address" placeholder="Paste a Release Covenant contract address (0x…)" value={addressInput} onChange={event => setAddressInput(event.target.value)} /><button disabled={loading}>{loading ? 'Loading…' : 'Load contract'} <ArrowRight size={15} /></button></form>{snapshot && <button className="refresh-button" aria-label="Refresh finalized state" onClick={() => void refresh()}><RefreshCcw size={17} /></button>}</div>
           {snapshot ? <div className="workspace-grid">
-            <div className="main-column"><div className="panel covenant-panel"><div className="panel-top"><span className="panel-tag">FINALIZED CONTRACT STATE</span><span className={`status-pill ${snapshot.outcome.toLowerCase()}`}><span />{finalStatus}</span></div><div className="covenant-title"><div><h3>{snapshot.repo}</h3><p>Release commitment · Round {snapshot.round} of 2</p></div><button onClick={copyAddress} className="copy-button">{copied ? <Check size={14} /> : <Link2 size={14} />}{short(address || '')}</button></div><div className="metric-row"><div><small>SPONSOR POOL</small><strong>{formatGen(snapshot.total_sponsored_wei)}</strong></div><div><small>OPEN OBJECTIONS</small><strong>{openCount.toString().padStart(2, '0')}</strong></div><div><small>PROMISES</small><strong>{snapshot.promises.length.toString().padStart(2, '0')} / 04</strong></div></div><div className="commit-grid"><div><small>BASELINE COMMIT</small><a href={`https://github.com/${snapshot.repo}/tree/${snapshot.baseline_sha}`} target="_blank" rel="noreferrer">{short(snapshot.baseline_sha, 7)} <ExternalLink size={12} /></a></div><div><small>CURRENT RELEASE COMMIT</small><a href={`https://github.com/${snapshot.repo}/tree/${snapshot.release_sha}`} target="_blank" rel="noreferrer">{short(snapshot.release_sha, 7)} <ExternalLink size={12} /></a></div></div></div>
+            <div className="main-column"><div className="panel covenant-panel"><div className="panel-top"><span className="panel-tag">FINALIZED CONTRACT STATE</span><span className={`status-pill ${snapshot.outcome.toLowerCase()}`}><span />{finalStatus}</span></div><div className="covenant-title"><div><h3>{snapshot.repo}</h3><p>Release commitment · Round {snapshot.round} of 2</p></div><button onClick={copyAddress} className="copy-button">{copied ? <Check size={14} /> : <Link2 size={14} />}{short(address || '')}</button></div><div className="metric-row"><div><small>TOTAL SPONSORED</small><strong>{formatGen(snapshot.total_sponsored_wei)}</strong></div><div><small>OPEN OBJECTIONS</small><strong>{openCount.toString().padStart(2, '0')}</strong></div><div><small>PROMISES</small><strong>{snapshot.promises.length.toString().padStart(2, '0')} / 04</strong></div></div><div className="commit-grid"><div><small>BASELINE COMMIT</small><a href={`https://github.com/${snapshot.repo}/tree/${snapshot.baseline_sha}`} target="_blank" rel="noreferrer">{short(snapshot.baseline_sha, 7)} <ExternalLink size={12} /></a></div><div><small>CURRENT RELEASE COMMIT</small><a href={`https://github.com/${snapshot.repo}/tree/${snapshot.release_sha}`} target="_blank" rel="noreferrer">{short(snapshot.release_sha, 7)} <ExternalLink size={12} /></a></div></div></div>
               <div className="promise-header"><div><div className="section-kicker">THE PUBLIC TERMS</div><h3>Promises & objections</h3></div><span>{snapshot.promises.length} total</span></div>
               {snapshot.promises.length ? snapshot.promises.map((item, index) => <article className="promise-card" key={index}><div className="promise-top"><span className="promise-index">P{String(index + 1).padStart(2, '0')}</span><span className={`promise-state ${item.state.toLowerCase()}`}>{item.state === 'CLEAN' ? 'No open objection' : item.state === 'OPEN' ? 'Break upheld' : item.state === 'CARRIED' ? 'Repair check due' : 'Repair verified'}</span></div><h4>{item.statement}</h4><div className="evidence-block"><span>BASELINE EVIDENCE</span><p>“{item.baseline_quote}”</p><a href={rawGitHub(snapshot.repo, snapshot.baseline_sha, item.baseline_path)} target="_blank" rel="noreferrer">{item.baseline_path} <ArrowUpRight size={13} /></a></div>{item.challenge_path && <div className="evidence-block challenge-evidence"><span>{item.state === 'REPAIRED' ? 'REPAIR EVIDENCE' : 'CHALLENGE EVIDENCE'}</span><p>“{item.challenge_quote}”</p><a href={rawGitHub(snapshot.repo, item.challenge_sha || snapshot.release_sha, item.challenge_path)} target="_blank" rel="noreferrer">{item.challenge_path} <ArrowUpRight size={13} /></a></div>}</article>) : <div className="empty-promises">The maintainer has not added promises yet.</div>}
             </div>
@@ -291,11 +299,16 @@ function App() {
         </>}
       </section>
 
-      <section className="activity-section"><div className="activity-heading"><div><div className="section-kicker">CONSENSUS ACTIVITY</div><h2>Transaction trail<span className="green-dot">.</span></h2><p>Saved in this browser so pending transactions resume after reload.</p></div><span className="activity-count">{latest.length} RECENT</span></div>{latest.length ? <div className="activity-list">{latest.map(tx => <div className="activity-item" key={tx.hash}><div className={`activity-icon ${tx.status.toLowerCase()}`}>{tx.status === 'FINALIZED' && tx.execution === 'FINISHED_WITH_RETURN' ? <Check size={18} /> : <Clock3 size={18} />}</div><div className="activity-main"><strong>{tx.action}</strong><small>{new Date(tx.submittedAt).toLocaleString()} · {short(tx.hash, 9)}</small></div><div className="activity-state"><strong>{tx.status.replaceAll('_', ' ')}</strong><small>{tx.execution.replaceAll('_', ' ')}</small></div><div className="activity-links"><a href={`${explorerBase[tx.network]}/transactions/${tx.hash}`} target="_blank" rel="noreferrer" aria-label="View transaction in explorer"><ArrowUpRight size={17} /></a>{tx.status === 'ACCEPTED' && <button disabled={busy} onClick={() => void handleAppeal(tx.hash)}>Appeal</button>}</div></div>)}</div> : <div className="activity-empty">No locally tracked transactions yet. Submitted writes will appear here.</div>}</section>
+      <section className="proof-section" aria-label="Recorded on-chain demo">
+        <div className="proof-heading"><div><div className="section-kicker">RECORDED PROOF · STUDIONET</div><h2>An objection, upheld<span className="green-dot">.</span></h2><p>This is a historical replay of public upstream commits by an independent operator. It is not a promise from that repository’s maintainer.</p></div><a href={`${explorerBase.studionet}/address/${recordedProof.contract_address}`} target="_blank" rel="noreferrer">View contract <ArrowUpRight size={15} /></a></div>
+        <div className="proof-card"><div className="proof-card-top"><span>RECORDED RECEIPTS</span><strong>{recordedProof.workflow_status.replaceAll('_', ' ')}</strong></div><div className="proof-receipts">{recordedProof.transactions.map(item => <a key={item.hash} href={`${explorerBase.studionet}/tx/${item.hash}`} target="_blank" rel="noreferrer"><span>{item.label}</span><small>{short(item.hash, 7)} · FINALIZED / SUCCESS</small><ArrowUpRight size={14} /></a>)}</div><p>The receipt list comes from the saved proof manifest. The contract state above is fetched live from the latest finalized chain state; it can advance beyond these recorded receipts.</p></div>
+      </section>
+
+      <section className="activity-section"><div className="activity-heading"><div><div className="section-kicker">CONSENSUS ACTIVITY</div><h2>Transaction trail<span className="green-dot">.</span></h2><p>Saved in this browser so pending transactions resume after reload.</p></div><span className="activity-count">{latest.length} RECENT</span></div>{latest.length ? <div className="activity-list">{latest.map(tx => <div className="activity-item" key={tx.hash}><div className={`activity-icon ${tx.status.toLowerCase()}`}>{tx.status === 'FINALIZED' && tx.execution === 'SUCCESS' ? <Check size={18} /> : <Clock3 size={18} />}</div><div className="activity-main"><strong>{tx.action}</strong><small>{new Date(tx.submittedAt).toLocaleString()} · {short(tx.hash, 9)}</small></div><div className="activity-state"><strong>{tx.status.replaceAll('_', ' ')}</strong><small>{tx.execution.replaceAll('_', ' ')}</small></div><div className="activity-links"><a href={`${explorerBase[tx.network]}/tx/${tx.hash}`} target="_blank" rel="noreferrer" aria-label="View transaction in explorer"><ArrowUpRight size={17} /></a>{tx.status === 'ACCEPTED' && <button disabled={busy} onClick={() => void handleAppeal(tx.hash)}>Appeal</button>}</div></div>)}</div> : <div className="activity-empty">No locally tracked transactions yet. Submitted writes will appear here.</div>}</section>
 
       <section className="closing-strip"><div><div className="section-kicker">DESIGNED FOR ACCOUNTABILITY</div><h2>Every objection has a path.<br /><em>Every path has an end.</em></h2></div><div><p>Validators interpret a bounded public claim. The contract enforces one revision, two challenge windows, and deterministic payment or refunds.</p><a href="https://docs.genlayer.com/understand-genlayer-protocol/core-concepts/non-deterministic-operations-handling" target="_blank" rel="noreferrer">How GenLayer judges <ArrowUpRight size={16} /></a></div></section>
     </main>
-    <footer><div className="brand"><span className="brand-mark"><Layers3 size={16} /></span><span>release<span className="brand-accent">covenant</span></span></div><span>Built for GenLayer · Source and contract included</span><span>Protocol preview · No deployment proof recorded</span></footer>
+    <footer><div className="brand"><span className="brand-mark"><Layers3 size={16} /></span><span>release<span className="brand-accent">covenant</span></span></div><span>Built for GenLayer · Source and contract included</span><span>StudioNet demo · Check receipt links above</span></footer>
   </div>;
 }
 

@@ -1,0 +1,21 @@
+{
+  "status": "deployed",
+  "workflow_status": "late_credit_withdrawn_empty_pool_settled",
+  "network": "studionet",
+  "contract_address": "0xd17eaFF374907A5d8637C89E8f79a0E46d15933A",
+  "source_sha256": "43db99346e657764460d52753b9176a570d63713b0cd07d15c90acb4fdc269bd",
+  "source_commit_at_deploy": "be7aaabf1c2510b95a5951f73300edacff2415fd",
+  "transactions": [
+    {"label": "deploy covenant", "hash": "0x8a70dd48a1333f53027ac48480887a989e23a7a0b600a53d5f36f080f276cda7"},
+    {"label": "record promise", "hash": "0xc77a38e9974a35bf82f6ee51e80565d0a25f0de492f405b814fe0db57c349204"},
+    {"label": "seal promise", "hash": "0xd8411404473499bb9700943e3a79e4c2cda4272603ec4006f511dca0b8db593d"},
+    {"label": "late sponsor credited for refund", "hash": "0x238db34758600ba341e3c6dfdda8979c4bc221fbedc9472bf860f27245b6f5d1"},
+    {"label": "withdraw late credit", "hash": "0xfba9ca0caf899c67b884622fd2906a1047e3e4d29d455f5405fae62622d9616d"},
+    {"label": "settle empty qualifying pool", "hash": "0x156712d955da60accd54228938e16ff0ddcb1fb01ef18fee3d76bfba95e169d1", "expected_result": "PAY"}
+  ],
+  "expected_snapshot": {"sealed": true, "outcome": "PAY", "total_sponsored_wei": "0"},
+  "expected_promise_states": ["CLEAN"],
+  "expected_accounts": [
+    {"address": "0x13A60e3F0bB123D91D1a2acCBEa1b15f99D3288A", "deposited_wei": "0", "claimable_wei": "0"}
+  ]
+}

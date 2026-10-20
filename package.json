@@ -6,7 +6,11 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "tsc --noEmit && vite build",
-    "verify:proof": "node deploy/verify-proof.mjs"
+    "verify:fixture": "node deploy/verify-fixture.mjs",
+    "verify:probe": "node deploy/verify-probe.mjs",
+    "verify:proof": "node deploy/verify-proof.mjs",
+    "verify:refund": "node deploy/verify-proof.mjs ./refund-proof.json",
+    "verify:late-credit": "node deploy/verify-proof.mjs ./late-credit-proof.json"
   },
   "dependencies": {
     "genlayer-js": "^1.1.8",

@@ -112,9 +112,11 @@ export async function transactionStatus(network: Network, hash: `0x${string}`) {
   const tx = await readClient(network).getTransaction({ hash: hash as TransactionHash });
   const decoded = tx.txDataDecoded;
   const contractAddress = decoded && 'contractAddress' in decoded ? decoded.contractAddress : tx.recipient;
+  const receipts = (tx.consensus_data as { leader_receipt?: Array<{ mode?: string; execution_result?: string }> } | undefined)?.leader_receipt;
+  const leader = receipts?.find(receipt => receipt.mode === 'leader');
   return {
     status: tx.statusName ?? 'UNKNOWN',
-    execution: tx.txExecutionResultName ?? 'UNKNOWN',
+    execution: leader?.execution_result ?? 'UNKNOWN',
     contractAddress: typeof contractAddress === 'string' && validAddress(contractAddress) ? contractAddress : undefined,
   };
 }
